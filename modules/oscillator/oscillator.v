@@ -1,7 +1,7 @@
 module oscillator #(
-    parameter COUNTER_WIDTH = 24,
-    parameter OUTPUT_WIDTH = 12,
-    parameter FREQ_BITS = 12
+    parameter COUNTER_WIDTH = 28,
+    parameter OUTPUT_WIDTH = 24,
+    parameter FCW_WIDTH = 16
 ) (
     // Clocks
     input main_clk,
@@ -9,6 +9,9 @@ module oscillator #(
 
     // Reset
     input reset,
+	 
+	 // Frequency control word
+	 input [FCW_WIDTH-1:0] fcw,
 
     // Selector
     // 0 - square
@@ -16,12 +19,8 @@ module oscillator #(
     // 2 - triangle
     input [1:0] sel,
 
-    // Freq
-    input [FREQ_BITS-1:0] freq,
-
-
     // Outputs
-    output wire [OUTPUT_WIDTH-1:0] dout
+    output wire signed [OUTPUT_WIDTH-1:0] dout
 );
     // Regs
     reg [COUNTER_WIDTH-1:0] counter;
@@ -64,20 +63,21 @@ module oscillator #(
         if (reset) begin
             counter <= 0;
         end else begin
-            counter <= counter + freq;
+            counter <= counter + fcw;
         end
     end
 
     
     always @(posedge sample_clk) begin
+		  dout_tmp = (2**OUTPUT_WIDTH)-1;
         case (sel)
-            2'b00:   dout_tmp = dout_square;
-            2'b01:   dout_tmp = dout_toothsaw;
-            2'b11:   dout_tmp = dout_triangle;
+            2'b00:   dout_tmp = dout_tmp & dout_square;
+            2'b01:   dout_tmp = dout_tmp & dout_toothsaw;
+            2'b10:   dout_tmp = dout_tmp & dout_triangle;
             default: dout_tmp = 0;
         endcase
     end
 
-    assign dout = dout_tmp;
+    assign dout = dout_tmp ^ (2**(OUTPUT_WIDTH-1));
     
 endmodule

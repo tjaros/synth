@@ -1,0 +1,40 @@
+module clock_divider_tb;
+
+  // Parameters
+  parameter integer INPUT_FREQ = 50_000_000;  // Input clock frequency in Hz
+  parameter integer OUTPUT_FREQ = 1_000;      // Desired output frequency in Hz
+  
+  // Signals
+  reg clk_in;
+  wire clk_out;
+
+  // Instantiate ClockDivider module
+  ClockDivider #(.INPUT_FREQ(INPUT_FREQ), .OUTPUT_FREQ(OUTPUT_FREQ))
+    dut (
+      .clk_in(clk_in),
+      .clk_out(clk_out)
+    );
+  
+  // Clock generator
+  always #5 clk_in = ~clk_in;
+  
+  // Stimulus
+  initial begin
+    #100;  // Allow some time for initialization
+    
+    // Display initial state
+    $display("Input Frequency: %0t Hz", INPUT_FREQ);
+    $display("Output Frequency: %0t Hz", OUTPUT_FREQ);
+    $display("Time\t\tclk_out");
+    
+    // Monitor the output clock signal
+    repeat (200) begin
+      #10;
+      $display("%0t\t%d", $time, clk_out);
+    end
+    
+    // End simulation
+    $finish;
+  end
+  
+endmodule

@@ -1,0 +1,284 @@
+$comment
+	File created using the following command:
+		vcd file synth.msim.vcd -direction
+$end
+$date
+	Sat Jun 24 17:12:28 2023
+$end
+$version
+	ModelSim Version 2020.1
+$end
+$timescale
+	1ps
+$end
+
+$scope module top_vlg_vec_tst $end
+$var reg 1 ! clk $end
+$var reg 1 " reset $end
+$var wire 1 # squareWave $end
+
+$scope module i1 $end
+$var wire 1 $ gnd $end
+$var wire 1 % vcc $end
+$var wire 1 & unknown $end
+$var tri1 1 ' devclrn $end
+$var tri1 1 ( devpor $end
+$var tri1 1 ) devoe $end
+$var wire 1 * ~QUARTUS_CREATED_GND~I_combout $end
+$var wire 1 + clk~input_o $end
+$var wire 1 , clk~inputCLKENA0_outclk $end
+$var wire 1 - oscillator|Add0~125_sumout $end
+$var wire 1 . reset~input_o $end
+$var wire 1 / oscillator|Add0~6 $end
+$var wire 1 0 oscillator|Add0~1_sumout $end
+$var wire 1 1 oscillator|LessThan0~7_combout $end
+$var wire 1 2 oscillator|counter[2]~DUPLICATE_q $end
+$var wire 1 3 oscillator|LessThan0~6_combout $end
+$var wire 1 4 oscillator|LessThan0~0_combout $end
+$var wire 1 5 oscillator|Add0~2 $end
+$var wire 1 6 oscillator|Add0~89_sumout $end
+$var wire 1 7 oscillator|Add0~90 $end
+$var wire 1 8 oscillator|Add0~93_sumout $end
+$var wire 1 9 oscillator|counter[17]~DUPLICATE_q $end
+$var wire 1 : oscillator|Add0~94 $end
+$var wire 1 ; oscillator|Add0~97_sumout $end
+$var wire 1 < oscillator|Add0~98 $end
+$var wire 1 = oscillator|Add0~101_sumout $end
+$var wire 1 > oscillator|Add0~102 $end
+$var wire 1 ? oscillator|Add0~61_sumout $end
+$var wire 1 @ oscillator|Add0~62 $end
+$var wire 1 A oscillator|Add0~105_sumout $end
+$var wire 1 B oscillator|Add0~106 $end
+$var wire 1 C oscillator|Add0~109_sumout $end
+$var wire 1 D oscillator|Add0~110 $end
+$var wire 1 E oscillator|Add0~113_sumout $end
+$var wire 1 F oscillator|counter[23]~DUPLICATE_q $end
+$var wire 1 G oscillator|Add0~114 $end
+$var wire 1 H oscillator|Add0~117_sumout $end
+$var wire 1 I oscillator|Add0~118 $end
+$var wire 1 J oscillator|Add0~121_sumout $end
+$var wire 1 K oscillator|Add0~122 $end
+$var wire 1 L oscillator|Add0~65_sumout $end
+$var wire 1 M oscillator|counter[26]~DUPLICATE_q $end
+$var wire 1 N oscillator|counter[18]~DUPLICATE_q $end
+$var wire 1 O oscillator|Add0~66 $end
+$var wire 1 P oscillator|Add0~69_sumout $end
+$var wire 1 Q oscillator|counter[27]~DUPLICATE_q $end
+$var wire 1 R oscillator|Add0~70 $end
+$var wire 1 S oscillator|Add0~73_sumout $end
+$var wire 1 T oscillator|Add0~74 $end
+$var wire 1 U oscillator|Add0~77_sumout $end
+$var wire 1 V oscillator|counter[29]~DUPLICATE_q $end
+$var wire 1 W oscillator|Add0~78 $end
+$var wire 1 X oscillator|Add0~81_sumout $end
+$var wire 1 Y oscillator|Add0~82 $end
+$var wire 1 Z oscillator|Add0~85_sumout $end
+$var wire 1 [ oscillator|LessThan0~2_combout $end
+$var wire 1 \ oscillator|LessThan0~3_combout $end
+$var wire 1 ] oscillator|LessThan0~1_combout $end
+$var wire 1 ^ oscillator|LessThan0~4_combout $end
+$var wire 1 _ oscillator|LessThan0~5_combout $end
+$var wire 1 ` oscillator|Add0~126 $end
+$var wire 1 a oscillator|Add0~17_sumout $end
+$var wire 1 b oscillator|Add0~18 $end
+$var wire 1 c oscillator|Add0~21_sumout $end
+$var wire 1 d oscillator|Add0~22 $end
+$var wire 1 e oscillator|Add0~25_sumout $end
+$var wire 1 f oscillator|counter[3]~DUPLICATE_q $end
+$var wire 1 g oscillator|Add0~26 $end
+$var wire 1 h oscillator|Add0~29_sumout $end
+$var wire 1 i oscillator|Add0~30 $end
+$var wire 1 j oscillator|Add0~33_sumout $end
+$var wire 1 k oscillator|Add0~34 $end
+$var wire 1 l oscillator|Add0~37_sumout $end
+$var wire 1 m oscillator|Add0~38 $end
+$var wire 1 n oscillator|Add0~41_sumout $end
+$var wire 1 o oscillator|Add0~42 $end
+$var wire 1 p oscillator|Add0~45_sumout $end
+$var wire 1 q oscillator|Add0~46 $end
+$var wire 1 r oscillator|Add0~13_sumout $end
+$var wire 1 s oscillator|Add0~14 $end
+$var wire 1 t oscillator|Add0~49_sumout $end
+$var wire 1 u oscillator|Add0~50 $end
+$var wire 1 v oscillator|Add0~53_sumout $end
+$var wire 1 w oscillator|Add0~54 $end
+$var wire 1 x oscillator|Add0~57_sumout $end
+$var wire 1 y oscillator|Add0~58 $end
+$var wire 1 z oscillator|Add0~9_sumout $end
+$var wire 1 { oscillator|Add0~10 $end
+$var wire 1 | oscillator|Add0~5_sumout $end
+$var wire 1 } oscillator|squareWave~0_combout $end
+$var wire 1 ~ oscillator|squareWave~q $end
+$var wire 1 !! oscillator|counter [31] $end
+$var wire 1 "! oscillator|counter [30] $end
+$var wire 1 #! oscillator|counter [29] $end
+$var wire 1 $! oscillator|counter [28] $end
+$var wire 1 %! oscillator|counter [27] $end
+$var wire 1 &! oscillator|counter [26] $end
+$var wire 1 '! oscillator|counter [25] $end
+$var wire 1 (! oscillator|counter [24] $end
+$var wire 1 )! oscillator|counter [23] $end
+$var wire 1 *! oscillator|counter [22] $end
+$var wire 1 +! oscillator|counter [21] $end
+$var wire 1 ,! oscillator|counter [20] $end
+$var wire 1 -! oscillator|counter [19] $end
+$var wire 1 .! oscillator|counter [18] $end
+$var wire 1 /! oscillator|counter [17] $end
+$var wire 1 0! oscillator|counter [16] $end
+$var wire 1 1! oscillator|counter [15] $end
+$var wire 1 2! oscillator|counter [14] $end
+$var wire 1 3! oscillator|counter [13] $end
+$var wire 1 4! oscillator|counter [12] $end
+$var wire 1 5! oscillator|counter [11] $end
+$var wire 1 6! oscillator|counter [10] $end
+$var wire 1 7! oscillator|counter [9] $end
+$var wire 1 8! oscillator|counter [8] $end
+$var wire 1 9! oscillator|counter [7] $end
+$var wire 1 :! oscillator|counter [6] $end
+$var wire 1 ;! oscillator|counter [5] $end
+$var wire 1 <! oscillator|counter [4] $end
+$var wire 1 =! oscillator|counter [3] $end
+$var wire 1 >! oscillator|counter [2] $end
+$var wire 1 ?! oscillator|counter [1] $end
+$var wire 1 @! oscillator|counter [0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+$dumpvars
+0!
+0"
+0#
+0$
+1%
+x&
+1'
+1(
+1)
+0*
+0+
+0,
+1-
+0.
+0/
+00
+01
+02
+03
+14
+05
+06
+07
+08
+09
+0:
+0;
+0<
+0=
+0>
+0?
+0@
+0A
+0B
+0C
+0D
+0E
+0F
+0G
+0H
+0I
+0J
+0K
+0L
+0M
+0N
+0O
+0P
+0Q
+0R
+0S
+0T
+0U
+0V
+0W
+0X
+0Y
+0Z
+1[
+1\
+1]
+1^
+0_
+0`
+0a
+0b
+0c
+0d
+0e
+0f
+0g
+0h
+0i
+0j
+0k
+0l
+0m
+0n
+0o
+0p
+0q
+0r
+0s
+0t
+0u
+0v
+0w
+0x
+0y
+0z
+0{
+0|
+0}
+0~
+0@!
+0?!
+0>!
+0=!
+0<!
+0;!
+0:!
+09!
+08!
+07!
+06!
+05!
+04!
+03!
+02!
+01!
+00!
+0/!
+0.!
+0-!
+0,!
+0+!
+0*!
+0)!
+0(!
+0'!
+0&!
+0%!
+0$!
+0#!
+0"!
+0!!
+$end
+#4000000
+1!
+1+
+1,
+1@!
+1`
+0-
+1a
+#8000000

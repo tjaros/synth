@@ -1,0 +1,83 @@
+module oscillator #(
+    parameter COUNTER_WIDTH = 28,
+    parameter OUTPUT_WIDTH = 24,
+    parameter FCW_BITS = 16
+) (
+    // Clocks
+    input main_clk,
+    input sample_clk,
+
+    // Reset
+    input reset,
+	 
+	 // Frequency control word
+	 input [FCW_BITS-1:0] fcw,
+
+    // Selector
+    // 0 - square
+    // 1 - saw
+    // 2 - triangle
+    input [1:0] sel,
+
+    // Outputs
+    output wire signed [OUTPUT_WIDTH-1:0] dout
+);
+    // Regs
+    reg [COUNTER_WIDTH-1:0] counter;
+    reg [OUTPUT_WIDTH-1:0]  dout_tmp;
+
+    // Wires
+    wire [OUTPUT_WIDTH-1:0] dout_triangle;
+    wire [OUTPUT_WIDTH-1:0] dout_toothsaw;
+    wire [OUTPUT_WIDTH-1:0] dout_square;
+
+
+    // Instantiations
+    wvf_triangle #(
+        .COUNTER_WIDTH(COUNTER_WIDTH),
+        .OUTPUT_WIDTH(OUTPUT_WIDTH)
+    ) m1 (
+        .counter(counter),
+        .dout(dout_triangle)
+    );
+
+    wvf_toothsaw #(
+        .COUNTER_WIDTH(COUNTER_WIDTH),
+        .OUTPUT_WIDTH(OUTPUT_WIDTH)
+    ) m2 (
+        .counter(counter),
+        .dout(dout_toothsaw)
+    );
+
+    wvf_square #(
+        .COUNTER_WIDTH(COUNTER_WIDTH),
+        .OUTPUT_WIDTH(OUTPUT_WIDTH)
+    ) m3 (
+        .counter(counter),
+        .dout(dout_square)
+    );
+
+    // Logic
+
+    always @(posedge main_clk) begin
+        if (reset) begin
+            counter <= 0;
+        end else begin
+            counter <= counter + fcw;
+        end
+    end
+
+    
+    always @(posedge sample_clk) begin
+		  dout_tmp = (2**OUTPUT_WIDTH)-1;
+        case (sel)
+            2'b00:   dout_tmp = dout_tmp & dout_square;
+            2'b01:   dout_tmp = dout_tmp & dout_toothsaw;
+            2'b11:   dout_tmp = dout_tmp & dout_triangle;
+            default: dout_tmp = 0;
+        endcase
+    end
+
+    assign dout = dout_tmp ^ (2**(OUTPUT_WIDTH-1));
+    
+endmodule

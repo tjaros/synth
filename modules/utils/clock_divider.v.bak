@@ -1,0 +1,22 @@
+module clock_divider #
+  (
+    parameter integer INPUT_FREQ = 50_000_000,  // Input clock frequency in Hz
+    parameter integer OUTPUT_FREQ = 1_000      // Desired output frequency in Hz
+  )
+  (
+    input wire clk_in,
+    output wire clk_out
+  );
+
+reg [31:0] count;
+
+always @(posedge clk_in) begin
+  if (count == (INPUT_FREQ / OUTPUT_FREQ) - 1) begin
+    count <= 0;
+    clk_out <= ~clk_out;
+  end else begin
+    count <= count + 1;
+  end
+end
+
+endmodule

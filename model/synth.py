@@ -18,53 +18,63 @@ def to_signed(x, n):
     return (-1 if sign != 0 else 1) * (x & (mask-1))
 
 
+# Wave types
+SQR = 0
+SAW = 1
+TRI = 2
+
+
 class Oscillator:
-    def __init__(self, main_clk_freq=50000000, sample_clk_freq=44100, sel=0, output_width=12, counter_width=24):
-        self.main_clk_freq = main_clk_freq
-        self.sample_clk_freq = sample_clk_freq
-        self.sel = sel
-        self.output_width = output_width
-        self.counter_width = counter_width
-
-        # Calculate number of cycles for each sample
-        self.cycles_per_sample = self.main_clk_freq // self.sample_clk_freq
-
-        # Initialize registers
-        self.counter = 0
-        self.sample_counter = 0
-
+    def __init__(self) -> None:
+        # Phase accumulator
+        self.pa = 0
+        self.pa_width = 28
+        # Frequency control word
+        self.fcw = 460856 #E4
+        self.fcw_width = 16
+        # waveform selector
+        self.wave_type = SQR
+        # clock frequency
+        self.clk_freq = 192000
+        self.sample_freq = 48000
+        self.sample_t = 0
+        # output width
+        self.output_width = 24
+    
+    def reset(self) -> None:
+        self.pa = 0
+        self.sample_t = 0
+        
     def wvf_square(self):
-        return 0 if self.counter >> (self.counter_width - self.output_width) <= 2 ** (self.output_width - 1) else 2 ** self.output_width - 1
+        return 0 if self.pa >> (self.pa_width - self.output_width) <= 2 ** (self.output_width - 1) else 2 ** self.output_width - 1
 
     def wvf_toothsaw(self):
-        return self.counter >> (self.counter_width - self.output_width)
-
-    def wvf_sine(self):
-        angle = 2 * math.pi * self.counter / (2 ** self.counter_width)
-        return int(round((2 ** (self.output_width - 1)) * math.sin(angle)))
+        return self.pa >> (self.pa_width - self.output_width)
 
     def wvf_triangle(self):
-        if self.counter < (2 ** (self.counter_width - 1)):
-            return self.counter >> (self.counter_width - self.output_width)
+        if self.pa < (2 ** (self.pa_width - 1)):
+            return self.pa >> (self.pa_width - self.output_width)
         else:
-            return (2 ** self.output_width - 1) - (self.counter >> (self.counter_width - self.output_width))
+            return (2 ** self.output_width - 1) - (self.pa >> (self.pa_width - self.output_width))
 
-    def __iter__(self):
-        while True:
-            if self.sample_counter == 0:
-                if self.sel == 0:
-                    yield self.wvf_square()
-                elif self.sel == 1:
-                    yield self.wvf_toothsaw()
-                elif self.sel == 2:
-                    yield self.wvf_sine()
-                elif self.sel == 3:
-                    yield self.wvf_triangle()
-
-            # Update counters
-            self.counter = (self.counter + self.sample_clk_freq) % (2 ** self.counter_width)
-            self.sample_counter = (self.sample_counter + 1) % self.sample_clk_freq
-
+    
+    def sample(self) -> int:
+        # We want to sample at given frequency
+        # Value of PA at x-th sample is 
+        # word * x * (clk_freq/sample_freq) % 2^pa_width
+        self.pa = (self.sample_t  * self.fcw * (self.clk_freq//self.sample_freq)) % (2**self.pa_width)
+        self.sample_t += 1 
+        
+        if self.wave_type == SQR:
+            return self.wvf_square()
+        
+        if self.wave_type == SAW:
+            return self.wvf_toothsaw()
+        
+        if self.wave_type == TRI:
+            return self.wvf_triangle()
+        
+        return 0
 
 class BiquadFilter:
     def __init__(self, b0, b1, b2, a1, a2):
@@ -80,7 +90,6 @@ class BiquadFilter:
         self.y_n  = 0
         self.y_n1 = 0
         self.y_n2 = 0
-
     
     def tick(self, x_n):
         y_n = self.b0 * x_n + self.b1 * self.x_n1 + self.b2 * self.x_n2  - self.a1 * self.y_n1 - self.a2 * self.y_n2
@@ -143,87 +152,73 @@ class EnvelopeGenerator:
 
         
 def main(sel):
-    osc_waveform = []
-    filtered_waveform = []
-    envelope_waveform_osc = []
-    envelope_waveform_fil = []
+    osc_vwf = []
+    envelope_osc_vwf = []
+    filtered_envelope_osc_vwf = []
     
-    osc = Oscillator(
-        main_clk_freq=50000000,
-        sample_clk_freq=44100,
-        sel=sel,
-        output_width=8,
-        counter_width=24
-    )
+    osc = Oscillator()
+    osc.wave_type = sel
     
-    a1 = -0.05042209
-    a2 = 0.19971489
-    b0 = 1.04882478
-    b1 = -0.05042209
-    b2 = 0.15089012
+    
+    a1 = -1.36635865
+    a2 = 0.52346993
+    b0 = 0.03927782
+    b1 = 0.07855564
+    b2 = 0.03927782
     biquad_filter = BiquadFilter(b0, b1, b2, a1, a2)
     
     # Envelope parameters
-    attack_time = 0.25
+    attack_time = 0.5
     decay_time = 0.25
     sustain_level = 0.25
-    release_time = 0.25
-    sample_rate = 200
+    release_time = 0
+    sample_rate = 48000
 
     # Instantiate the envelope generator
     envelope = EnvelopeGenerator(attack_time, decay_time, sustain_level, release_time, sample_rate)
     
     samples = 1000
-    for i, osc_value in enumerate(osc):
-        if i >= samples:
-            break
+    for i in  range(samples):
         
         # Trigger the envelope at the beginning of each note
-        if i % osc.cycles_per_sample == 0:
+        if i == 0:
             envelope.trigger()
         
-        osc_value = (osc_value - (2**(osc.output_width-1)))/ (2**(osc.output_width -1))
-        
+        # osc
+        osc_value = osc.sample()
+        osc_value = (osc_value - (2**(osc.output_width-1))) / (2**(osc.output_width -1))
+        # env
         envelope_value = envelope.tick()
-        fil_value = biquad_filter.tick(osc_value)
+        # Filter envelope * osc
+        fil_value = biquad_filter.tick(osc_value * envelope_value)
 
-        osc_waveform.append(osc_value)
-        filtered_waveform.append(fil_value)
-        envelope_waveform_osc.append(envelope_value * osc_value)
-        envelope_waveform_fil.append(envelope_value * fil_value)
-        
-        if i % 10 == 0:
-            print(f"{len(osc_waveform)} {osc_value=} {fil_value=} {envelope_value=}")
+        osc_vwf.append(osc_value)
+        envelope_osc_vwf.append(envelope_value * osc_value)
+        filtered_envelope_osc_vwf.append(envelope_value * fil_value)
         
         
     t = list(range(samples))
     # Plotting
-    plt.figure(figsize=(20, 12))
+    plt.figure(figsize=(10, 6))
     
-    plt.subplot(4, 1, 1)
-    plt.plot(t, osc_waveform)
+    plt.subplot(3, 1, 1)
+    plt.plot(t, osc_vwf)
     plt.title('Oscillator Waveform')
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
 
-    plt.subplot(4, 1, 2)
-    plt.plot(t, filtered_waveform)
-    plt.title('Filtered Waveform')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Amplitude')
-
-    plt.subplot(4, 1, 3)
-    plt.plot(t, envelope_waveform_osc)
+    plt.subplot(3, 1, 2)
+    plt.plot(t, envelope_osc_vwf)
     plt.title('Envelope * Oscillator Waveform')
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
-    
-    plt.subplot(4, 1, 4)
-    plt.plot(t, envelope_waveform_fil)
-    plt.title('Envelope * Filtered Waveform')
+
+    plt.subplot(3, 1, 3)
+    plt.plot(t, filtered_envelope_osc_vwf)
+    plt.title('filter(Envelope * Oscillator Waveform)')
     plt.xlabel('Time (s)')
     plt.ylabel('Amplitude')
-
+    
     plt.tight_layout()
     plt.show()
 
@@ -231,7 +226,6 @@ def main(sel):
         
 
 if __name__ == '__main__':
-    main(0)
-    main(1)
-    main(2)
-    main(3)
+    main(SQR)
+    main(SAW)
+    main(TRI)
